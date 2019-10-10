@@ -11,62 +11,57 @@
  * the readme will list any important changes.
  *
  * @see     https://docs.woocommerce.com/document/template-structure/
- * @author  WooThemes
  * @package WooCommerce/Templates
- * @version 3.0.0
+ * @version 3.6.0
  */
-if (!defined('ABSPATH')) {
-    exit; // Exit if accessed directly
-}
+
+defined( 'ABSPATH' ) || exit;
 
 global $product;
 
-// Ensure visibility
-if (empty($product) || !$product->is_visible()) {
-    return;
+// Ensure visibility.
+if ( empty( $product ) || ! $product->is_visible() ) {
+	return;
 }
 ?>
-<li class="col-md-4 col-6">
-    <div class="theme-card">
-        <div class="theme-card__body">
-            <a class="d-block" href="<?php the_permalink(); ?>">
-                <?php the_post_thumbnail("smaller_crop", array('class' => 'theme-card__img')); ?>
-            </a>
+<li <?php wc_product_class( '', $product ); ?>>
+	<?php
+	/**
+	 * Hook: woocommerce_before_shop_loop_item.
+	 *
+	 * @hooked woocommerce_template_loop_product_link_open - 10
+	 */
+	do_action( 'woocommerce_before_shop_loop_item' );
 
-            <a class="theme-card__body__overlay btn btn-brand btn-sm" target="_blank" href="<?php echo get_bloginfo("url"); ?>/preview/?theme_id=<?php the_ID(); ?>">Live preview</a>
-        </div>
-        <div class="theme-card__footer">
-            <div class="theme-card__footer__item"><a class="theme-card__title mr-1" href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-                <p class="theme-card__info">
-                    <?php
-                    $product_cats = wp_get_post_terms(get_the_ID(), 'product_cat');
-                    if (count($product_cats)) {
-                        echo '<ul class="prod_cats_list">';
-                        $prod_cat = $product_cats[0];
-                        echo '<li><a href="' . get_term_link($prod_cat) . '">' . $prod_cat->name . '</a></li>';
-                        echo '</ul>';
-                    }
-                    ?>
-                </p>
-            </div>
-            <div class="theme-card__footer__item">
-                <p class="theme-card__price"><?php echo $product->get_price_html(); ?></p>
+	/**
+	 * Hook: woocommerce_before_shop_loop_item_title.
+	 *
+	 * @hooked woocommerce_show_product_loop_sale_flash - 10
+	 * @hooked woocommerce_template_loop_product_thumbnail - 10
+	 */
+	do_action( 'woocommerce_before_shop_loop_item_title' );
 
-                <ul class="rating">
-                    <?php
-                    $average = round($product->get_average_rating());
-                    for ($i = 0; $i < 5; $i++) {
-                        if ($i < $average) {
-                            $cl = 'rating__item--active';
-                        } else {
-                            $cl = "";
-                        }
-                        echo '<li class="rating__item ' . $cl . '"></li>';
-                    }
-                    ?>
-                </ul>
-            </div>
-        </div>
-    </div>
+	/**
+	 * Hook: woocommerce_shop_loop_item_title.
+	 *
+	 * @hooked woocommerce_template_loop_product_title - 10
+	 */
+	do_action( 'woocommerce_shop_loop_item_title' );
+
+	/**
+	 * Hook: woocommerce_after_shop_loop_item_title.
+	 *
+	 * @hooked woocommerce_template_loop_rating - 5
+	 * @hooked woocommerce_template_loop_price - 10
+	 */
+	do_action( 'woocommerce_after_shop_loop_item_title' );
+
+	/**
+	 * Hook: woocommerce_after_shop_loop_item.
+	 *
+	 * @hooked woocommerce_template_loop_product_link_close - 5
+	 * @hooked woocommerce_template_loop_add_to_cart - 10
+	 */
+	do_action( 'woocommerce_after_shop_loop_item' );
+	?>
 </li>
-
