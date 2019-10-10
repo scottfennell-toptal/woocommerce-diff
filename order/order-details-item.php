@@ -10,51 +10,59 @@
  * happen. When this occurs the version of the template file will be bumped and
  * the readme will list any important changes.
  *
- * @see 	https://docs.woocommerce.com/document/template-structure/
- * @author  WooThemes
+ * @see https://docs.woocommerce.com/document/template-structure/
  * @package WooCommerce/Templates
- * @version 3.0.0
+ * @version 3.7.0
  */
-if (!defined('ABSPATH')) {
-    exit;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
-global $wpdb;
-$author_id = $wpdb->get_var("SELECT `post_author` FROM `" . $wpdb->prefix . "posts` WHERE `ID`='" . $product->get_ID() . "'");
-$dokan_profile_settings = get_user_meta($author_id, "dokan_profile_settings", true);
-
-if (!apply_filters('woocommerce_order_item_visible', true, $item)) {
-    return;
+if ( ! apply_filters( 'woocommerce_order_item_visible', true, $item ) ) {
+	return;
 }
 ?>
-<div class="card--summary__item">
-    <div class="card--summary__theme-thumb">
-        <img class="img-fluid" src="<?php echo get_the_post_thumbnail_url($product->get_ID(), 'smaller_crop'); ?>" alt="">
-    </div>
-    <div class="card--summary__theme-description">
-        <div>
-          <h5 class="card--summary__theme-title"><?php echo get_the_title($product->get_ID()); ?></h5>
-          <?php
-          do_action('woocommerce_order_item_meta_start', $item_id, $item, $order);
-          wc_display_item_meta($item);
-          do_action('woocommerce_order_item_meta_end', $item_id, $item, $order);
-          ?>
-        </div>
-        <div class="card--summary__theme-action">
-            <p class="card--summary__theme-price"><?php echo "$" . number_format($item->get_subtotal(), 2); ?></p>
-            <?php
-            $downloads = wc_display_item_downloads($item, array("echo" => false));
-            $stpos = 0;
-            $downloads = str_replace('<strong class="wc-item-download-label">Download:</strong>', '', $downloads);
-            while ($stpos = strpos($downloads, 'target="_blank">', $stpos + 1)) {
-                $nd_pos = strpos($downloads, '</a>', $stpos);
-                $downloads = substr($downloads, 0, $stpos + 16) . "Download" . substr($downloads, $nd_pos);
-            }
-            echo $downloads;
-            if ($dokan_profile_settings["support_link"]) {
-                ?>
-                <a href="<?php echo $dokan_profile_settings["support_link"]; ?>">Get Support</a>
-            <?php } ?>
-        </div>
-    </div>
-</div>
+<tr class="<?php echo esc_attr( apply_filters( 'woocommerce_order_item_class', 'woocommerce-table__line-item order_item', $item, $order ) ); ?>">
+
+	<td class="woocommerce-table__product-name product-name">
+		<?php
+		$is_visible        = $product && $product->is_visible();
+		$product_permalink = apply_filters( 'woocommerce_order_item_permalink', $is_visible ? $product->get_permalink( $item ) : '', $item, $order );
+
+		echo apply_filters( 'woocommerce_order_item_name', $product_permalink ? sprintf( '<a href="%s">%s</a>', $product_permalink, $item->get_name() ) : $item->get_name(), $item, $is_visible ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+
+		$qty          = $item->get_quantity();
+		$refunded_qty = $order->get_qty_refunded_for_item( $item_id );
+
+		if ( $refunded_qty ) {
+			$qty_display = '<del>' . esc_html( $qty ) . '</del> <ins>' . esc_html( $qty - ( $refunded_qty * -1 ) ) . '</ins>';
+		} else {
+			$qty_display = esc_html( $qty );
+		}
+
+		echo apply_filters( 'woocommerce_order_item_quantity_html', ' <strong class="product-quantity">' . sprintf( '&times; %s', $qty_display ) . '</strong>', $item ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+
+		do_action( 'woocommerce_order_item_meta_start', $item_id, $item, $order, false );
+
+		wc_display_item_meta( $item ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+
+		do_action( 'woocommerce_order_item_meta_end', $item_id, $item, $order, false );
+		?>
+	</td>
+
+	<td class="woocommerce-table__product-total product-total">
+		<?php echo $order->get_formatted_line_subtotal( $item ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+	</td>
+
+</tr>
+
+<?php if ( $show_purchase_note && $purchase_note ) : ?>
+
+<tr class="woocommerce-table__product-purchase-note product-purchase-note">
+
+	<td colspan="2"><?php echo wpautop( do_shortcode( wp_kses_post( $purchase_note ) ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
+
+</tr>
+
+<?php endif; ?>
