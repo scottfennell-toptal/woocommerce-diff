@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Customer new account email
  *
@@ -15,21 +16,17 @@
  * @package 	WooCommerce/Templates/Emails/Plain
  * @version     2.0.0
  */
-
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if (!defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
 echo "= " . $email_heading . " =\n\n";
 
-echo sprintf( __( 'Thanks for creating an account on %1$s. Your email for this account is %2$s', 'woocommerce' ), $blogname, '<strong>' . $user_login . '</strong>' ) . "\n\n";
+echo sprintf(__('The seller replied to your review of %1$s', 'woocommerce'), ($product_name));
 
-if ( 'yes' === get_option( 'woocommerce_registration_generate_password' ) && $password_generated ) {
-	echo sprintf( __( 'Your password is %s.', 'woocommerce' ), '<strong>' . $user_pass . '</strong>' ) . "\n\n";
-}
 
-echo sprintf( __( 'You can access your account here: %s.', 'woocommerce' ), wc_get_page_permalink( 'myaccount' ) ) . "\n\n";
+echo sprintf(__('You can view the reply and edit your review here: %s.', 'woocommerce'), (esc_url(get_permalink($product_id))));
 
 echo "\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n\n";
 
-echo apply_filters( 'woocommerce_email_footer_text', get_option( 'woocommerce_email_footer_text' ) );
+echo apply_filters('woocommerce_email_footer_text', get_option('woocommerce_email_footer_text'));

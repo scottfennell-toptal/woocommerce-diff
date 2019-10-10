@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Customer new account email
  *
@@ -15,21 +16,26 @@
  * @package 	WooCommerce/Templates/Emails/Plain
  * @version     2.0.0
  */
-
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if (!defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
-echo "= " . $email_heading . " =\n\n";
 
-echo sprintf( __( 'Thanks for creating an account on %1$s. Your email for this account is %2$s', 'woocommerce' ), $blogname, '<strong>' . $user_login . '</strong>' ) . "\n\n";
+echo "= " . str_replace("[{product_name}]", $product_name, $email_heading) . " =\n\n";
 
-if ( 'yes' === get_option( 'woocommerce_registration_generate_password' ) && $password_generated ) {
-	echo sprintf( __( 'Your password is %s.', 'woocommerce' ), '<strong>' . $user_pass . '</strong>' ) . "\n\n";
+echo sprintf(__('%1$s has been updated!', 'woocommerce'), ($product_name));
+
+if ($msg) {
+    echo sprintf(__('A message from %1$s about the update: ', 'woocommerce'), ($seller_name));
+    echo $msg;
 }
 
-echo sprintf( __( 'You can access your account here: %s.', 'woocommerce' ), wc_get_page_permalink( 'myaccount' ) ) . "\n\n";
+echo '<a href="' . $download_url . '">Download the update</a>';
+if ($seller_support) {
+    echo '<a href="' . $seller_support . '" target="_blank">Request Support</a>';
+}
+echo sprintf(__('Thanks so much for purchasing a Bootstrap Theme!\n\nCheers,\nTeam Bootstrap'));
 
 echo "\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n\n";
 
-echo apply_filters( 'woocommerce_email_footer_text', get_option( 'woocommerce_email_footer_text' ) );
+echo apply_filters('woocommerce_email_footer_text', get_option('woocommerce_email_footer_text'));
